@@ -1,9 +1,18 @@
-from typing import Annotated
+from typing import Annotated, cast
+import jwt
+from jwt.exceptions import InvalidTokenError
 import bcrypt
 from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from tinydb import TinyDB, where
+from app.config import TokenConfig
 from app.dependencies.common import db_connection
 from app.schemas.auth import RegisterCredentials, LoginCredentials
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+# validation dependencies
 
 def valid_register_credentials(
     credentials: RegisterCredentials,
@@ -27,3 +36,20 @@ def valid_login_credentials(
     ):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return credentials
+
+
+# authorization dependencies
+
+def verify_token(token: Annotated[str, Depends(oauth2_scheme)]) -> dict[str, str | int]:
+    try:
+        payload = cast(
+            dict[str, str | int],
+            jwt.decode(token, TokenConfig.SECRET_KEY, algorithms=[TokenConfig.ALGORITHM])
+        )
+        return payload
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+def get_current_user(payload: Annotated[dict[str, str | int], Depends(verify_token)]) -> str:
+    username = cast(str, payload["sub"])
+    return username

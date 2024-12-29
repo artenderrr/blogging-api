@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 import bcrypt
 from tinydb import TinyDB
@@ -28,7 +28,7 @@ class AuthenticateService:
     def create_access_token(credentials: LoginCredentials) -> str:
         payload = {
             "sub": credentials.username,
-            "exp": datetime.now() + timedelta(seconds=TokenConfig.EXPIRE_SECONDS)
+            "exp": datetime.now(timezone.utc) + timedelta(seconds=TokenConfig.EXPIRE_SECONDS)
         }
         access_token = jwt.encode(payload, TokenConfig.SECRET_KEY, algorithm=TokenConfig.ALGORITHM)
         return access_token
