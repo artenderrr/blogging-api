@@ -1,6 +1,9 @@
+from datetime import datetime, timedelta
+import jwt
 import bcrypt
 from tinydb import TinyDB
-from app.schemas.auth import RegisterCredentials
+from app.config import TokenConfig
+from app.schemas.auth import RegisterCredentials, LoginCredentials
 
 class RegisterService:
     def __init__(self) -> None:
@@ -19,3 +22,13 @@ class RegisterService:
                 "password": self._hash_password(credentials.password)
             }
         )
+
+class AuthenticateService:
+    @staticmethod
+    def create_access_token(credentials: LoginCredentials) -> str:
+        payload = {
+            "sub": credentials.username,
+            "exp": datetime.now() + timedelta(seconds=TokenConfig.EXPIRE_SECONDS)
+        }
+        access_token = jwt.encode(payload, TokenConfig.SECRET_KEY, algorithm=TokenConfig.ALGORITHM)
+        return access_token
