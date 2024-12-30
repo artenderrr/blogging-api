@@ -3,7 +3,11 @@ from fastapi import FastAPI, Depends
 from app.routers import auth
 from app.dependencies.auth import get_current_user
 
-app = FastAPI()
+app = FastAPI(
+    title="Blogging API",
+    description="**Description:** API to interact with simple blogging platform.\n\n**Current state:** Experimental.",
+    version="0.0.1"
+)
 
 @app.get("/")
 def root() -> dict[str, str]:

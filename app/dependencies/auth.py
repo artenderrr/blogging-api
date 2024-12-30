@@ -2,10 +2,11 @@ from typing import Annotated, cast
 import jwt
 from jwt.exceptions import InvalidTokenError
 import bcrypt
-from fastapi import Depends, HTTPException
+from fastapi import Body, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from tinydb import TinyDB, where
 from app.config import TokenConfig
+from app.examples.requests import AuthExampleRequests
 from app.dependencies.common import db_connection
 from app.schemas.auth import RegisterCredentials, LoginCredentials
 
@@ -15,7 +16,9 @@ security = HTTPBearer()
 # validation dependencies
 
 def valid_register_credentials(
-    credentials: RegisterCredentials,
+    credentials: Annotated[RegisterCredentials, Body(
+        openapi_examples=AuthExampleRequests.register_credentials
+    )],
     db: Annotated[TinyDB, Depends(db_connection("app/db/credentials.json"))]
 ) -> RegisterCredentials:
     if db.contains(where("username") == credentials.username):
@@ -23,7 +26,9 @@ def valid_register_credentials(
     return credentials
 
 def valid_login_credentials(
-    credentials: LoginCredentials,
+    credentials: Annotated[LoginCredentials, Body(
+        openapi_examples=AuthExampleRequests.login_credentials
+    )],
     db: Annotated[TinyDB, Depends(db_connection("app/db/credentials.json"))]
 ) -> LoginCredentials:
     if (
