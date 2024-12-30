@@ -3,13 +3,13 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 import bcrypt
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from tinydb import TinyDB, where
 from app.config import TokenConfig
 from app.dependencies.common import db_connection
 from app.schemas.auth import RegisterCredentials, LoginCredentials
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+security = HTTPBearer()
 
 
 # validation dependencies
@@ -40,7 +40,10 @@ def valid_login_credentials(
 
 # authorization dependencies
 
-def verify_token(token: Annotated[str, Depends(oauth2_scheme)]) -> dict[str, str | int]:
+def verify_token(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)]
+) -> dict[str, str | int]:
+    token = credentials.credentials
     try:
         payload = cast(
             dict[str, str | int],
