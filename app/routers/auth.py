@@ -9,6 +9,7 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post(
     "/register",
+    status_code=201,
     summary="Create a new user account",
     responses={409: AuthExampleResponses.username_is_taken}
 )
