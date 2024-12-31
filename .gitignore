@@ -11,3 +11,4 @@ wheels/
 
 # Database JSON files
 app/db/*.json
+tests/backup/*.json
