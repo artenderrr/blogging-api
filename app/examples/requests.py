@@ -48,3 +48,36 @@ class AuthExampleRequests:
             }
         }
     }
+
+class UserProfilesExampleRequests:
+    username = {
+        "normal": {
+            "summary": "Valid username",
+            "value": "existing_username"
+        },
+        "invalid": {
+            "summary": "Invalid username",
+            "value": "nonexistent_username"
+        }
+    }
+
+    update_fields = {
+        "normal": {
+            "summary": "Valid update fields",
+            "description": (
+                "The request body must include at least one valid field defined in "
+                "the `UserProfileUpdateFields` schema."
+            ),
+            "value": {
+                "bio": "Backend Python Developer"
+            }
+        },
+        "invalid": {
+            "summary": "Invalid update fields",
+            "description": (
+                "Update fields are considered invalid if the request body is empty or "
+                "contains only fields that do not match the valid fields defined in `UserProfileUpdateFields` schema."
+            ),
+            "value": {}
+        }
+    }
