@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import FastAPI, Depends
-from app.routers import auth
+from app.routers import auth, users
 from app.dependencies.auth import get_current_user
 
 app = FastAPI(
@@ -20,3 +20,4 @@ def protected(
     return {"message": f"Hello, {username}!"}
 
 app.include_router(auth.router)
+app.include_router(users.router)

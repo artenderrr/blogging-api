@@ -6,6 +6,21 @@ from app.main import app
 
 client = TestClient(app)
 
+def assert_credentials_creation(credentials: dict[str, str]) -> None:
+    db = TinyDB("app/db/credentials.json")
+    assert db.contains(where("username") == credentials["username"])
+    assert bcrypt.checkpw(
+        credentials["password"].encode("utf-8"),
+        db.get(where("username") == credentials["username"])["password"].encode("utf-8")
+    )
+
+def assert_user_creation(credentials: dict[str, str]) -> None:
+    db = TinyDB("app/db/users.json")
+    assert db.contains(where("username") == credentials["username"])
+    created_user = db.get(where("username") == credentials["username"])
+    assert created_user["bio"] is None
+    assert created_user["totalPosts"] == 0
+
 @pytest.mark.parametrize(
     "credentials",
     [
@@ -15,14 +30,10 @@ client = TestClient(app)
     ]
 )
 def test_on_valid_credentials(credentials: dict[str, str]) -> None:
-    db = TinyDB("app/db/credentials.json")
     response = client.post("/register", json=credentials)
     assert response.status_code == 201
-    assert db.contains(where("username") == credentials["username"])
-    assert bcrypt.checkpw(
-        credentials["password"].encode("utf-8"),
-        db.get(where("username") == credentials["username"])["password"].encode("utf-8")
-    )
+    assert_credentials_creation(credentials)
+    assert_user_creation(credentials)
 
 @pytest.mark.parametrize(
     "credentials",

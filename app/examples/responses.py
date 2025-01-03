@@ -16,3 +16,22 @@ class AuthExampleResponses:
             }
         }
     }
+
+    invalid_token = {
+        "description": "Invalid Token",
+        "content": {
+            "application/json": {
+                "example": {"detail": "Invalid or expired token"}
+            }
+        }
+    }
+
+class UserProfilesExampleResponses:
+    nonexistent_user = {
+        "description": "Nonexistent User",
+        "content": {
+            "application/json": {
+                "example": {"detail": "User with provided username doesn't exist"}
+            }
+        }
+    }

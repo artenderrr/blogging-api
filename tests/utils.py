@@ -1,6 +1,10 @@
 import os
 import shutil
-from typing import Callable
+from typing import Callable, cast
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
 
 class FileManager:
     ignored = {".gitkeep"}
@@ -48,3 +52,23 @@ class Backup:
     def restore(self) -> None:
         FileManager.transfer_files(self.backup_dir, self.source_dir)
         FileManager.clear_directory(self.backup_dir)
+
+class AuthorizationData:
+    _default_credentials = {
+        "username": "test_user",
+        "password": "TestPassword"
+    }
+
+    def __init__(self, *, credentials: dict[str, str] | None = None) -> None:
+        self.credentials = credentials or self._default_credentials
+        self.token = self._authenticate()
+        self.header = self._generate_header()
+
+    def _authenticate(self) -> str:
+        client.post("/register", json=self.credentials)
+        response = client.post("/login", json=self.credentials)
+        access_token = cast(str, response.json()["access_token"])
+        return access_token
+
+    def _generate_header(self) -> dict[str, str]:
+        return {"Authorization": f"Bearer {self.token}"}

@@ -16,7 +16,7 @@ router = APIRouter(tags=["Authentication"])
 def register(
     credentials: Annotated[RegisterCredentials, Depends(valid_register_credentials)]
 ) -> BaseCredentials:
-    RegisterService().create_credentials(credentials)
+    RegisterService(credentials).register_user()
     return credentials
 
 @router.post(

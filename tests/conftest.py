@@ -1,6 +1,7 @@
 from typing import Generator
 import pytest
-from tests.utils import Backup, FileManager
+from pytest import FixtureRequest
+from tests.utils import Backup, FileManager, AuthorizationData
 
 @pytest.fixture(scope="session", autouse=True)
 def backup() -> Generator[None, None, None]:
@@ -11,3 +12,8 @@ def backup() -> Generator[None, None, None]:
 @pytest.fixture(autouse=True)
 def cleanup() -> None:
     FileManager.clear_directory("app/db")
+
+@pytest.fixture
+def authorization(request: FixtureRequest) -> AuthorizationData:
+    credentials = getattr(request, "param", None)
+    return AuthorizationData(credentials=credentials)
