@@ -35,3 +35,13 @@ class UserProfilesExampleResponses:
             }
         }
     }
+
+class PostsExampleResponses:
+    nonexistent_post = {
+        "description": "Nonexistent Post",
+        "content": {
+            "application/json": {
+                "example": {"detail": "Post with provided ID doesn't exist"}
+            }
+        }
+    }

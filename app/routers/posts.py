@@ -5,7 +5,7 @@ from app.dependencies.posts import existing_post_id
 from app.dependencies.auth import get_current_user, verify_token
 from app.schemas.posts import BasePost, PostWithMetaData
 from app.examples.requests import PostsExampleRequests
-from app.examples.responses import AuthExampleResponses
+from app.examples.responses import AuthExampleResponses, PostsExampleResponses
 
 router = APIRouter(tags=["Posts"])
 
@@ -28,7 +28,15 @@ def create_post(
     )
     return created_post
 
-@router.get("/posts/{post_id}", dependencies=[Depends(verify_token)])
+@router.get(
+    "/posts/{post_id}",
+    summary="Retrieve a specific post by its unique identifier",
+    responses={
+        401: AuthExampleResponses.invalid_token,
+        404: PostsExampleResponses.nonexistent_post
+    },
+    dependencies=[Depends(verify_token)]
+)
 def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWithMetaData:
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post

@@ -98,3 +98,14 @@ class PostsExampleRequests:
             "value": {}
         }
     }
+
+    post_id = {
+        "normal": {
+            "summary": "Valid post ID",
+            "value": 1
+        },
+        "invalid": {
+            "summary": "Invalid post ID",
+            "value": "nonexistent_id"
+        }
+    }
