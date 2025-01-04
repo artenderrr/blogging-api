@@ -26,3 +26,9 @@ class PostsService:
     @staticmethod
     def _generate_timestamp() -> str:
         return datetime.now().isoformat()
+    
+    def retrieve_post(self, post_id: int) -> PostWithMetaData:
+        retrieved_post = self.posts_db.get(where("postId") == post_id)
+        retrieved_post["post_id"] = retrieved_post["postId"]
+        retrieved_post.pop("postId")
+        return PostWithMetaData(**retrieved_post)

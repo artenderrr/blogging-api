@@ -1,7 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Body, Depends
 from app.services.posts import PostsService
-from app.dependencies.auth import get_current_user
+from app.dependencies.posts import existing_post_id
+from app.dependencies.auth import get_current_user, verify_token
 from app.schemas.posts import BasePost, PostWithMetaData
 from app.examples.requests import PostsExampleRequests
 from app.examples.responses import AuthExampleResponses
@@ -26,3 +27,8 @@ def create_post(
         content=post.content
     )
     return created_post
+
+@router.get("/posts/{post_id}", dependencies=[Depends(verify_token)])
+def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWithMetaData:
+    retrieved_post = PostsService().retrieve_post(post_id)
+    return retrieved_post
