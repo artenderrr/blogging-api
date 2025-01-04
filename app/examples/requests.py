@@ -81,3 +81,20 @@ class UserProfilesExampleRequests:
             "value": {}
         }
     }
+
+class PostsExampleRequests:
+    new_post = {
+        "normal": {
+            "summary": "Valid post",
+            "description": "A valid request must include both required fields: `title` and `content`.",
+            "value": {
+                "title": "My first post",
+                "content": "Here are some contents of my first post!"
+            }
+        },
+        "invalid": {
+            "summary": "Invalid post",
+            "description": "Post is considered invalid if the request body is missing one or both required fields: `title` and `content`.",
+            "value": {}
+        }
+    }
