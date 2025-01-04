@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import FastAPI, Depends
-from app.routers import auth, users
+from app.routers import auth, users, posts
 from app.dependencies.auth import get_current_user
 
 app = FastAPI(
@@ -21,3 +21,4 @@ def protected(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(posts.router)
