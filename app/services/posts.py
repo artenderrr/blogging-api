@@ -1,6 +1,7 @@
+from typing import cast
 from datetime import datetime
 from tinydb import TinyDB, where
-from tinydb.operations import increment
+from tinydb.operations import increment, decrement
 from app.schemas.posts import PostWithMetaData
 
 class PostsService:
@@ -32,3 +33,16 @@ class PostsService:
         retrieved_post["post_id"] = retrieved_post["postId"]
         retrieved_post.pop("postId")
         return PostWithMetaData(**retrieved_post)
+    
+    def delete_post(self, post_id: int) -> None:
+        author = self._get_post_author(post_id)
+        self._decrement_author_total_posts(author)
+        self.posts_db.remove(where("postId") == post_id)
+
+    def _get_post_author(self, post_id: int) -> str:
+        post = self.posts_db.get(where("postId") == post_id)
+        author = cast(str, post["author"])
+        return author
+    
+    def _decrement_author_total_posts(self, author: str) -> None:
+        self.users_db.update(decrement("totalPosts"), where("username") == author) # type: ignore

@@ -1,7 +1,7 @@
 from typing import Annotated
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from app.services.posts import PostsService
-from app.dependencies.posts import existing_post_id
+from app.dependencies.posts import existing_post_id, post_ownership_matches_current_user
 from app.dependencies.auth import get_current_user, verify_token
 from app.schemas.posts import BasePost, PostWithMetaData
 from app.examples.requests import PostsExampleRequests
@@ -40,3 +40,12 @@ def create_post(
 def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWithMetaData:
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
+
+@router.delete("/posts/{post_id}", status_code=204)
+def delete_post(
+    post_id: Annotated[int, Depends(existing_post_id)],
+    username: Annotated[str, Depends(get_current_user)]
+) -> None:
+    if not post_ownership_matches_current_user(post_id, username):
+        raise HTTPException(status_code=403, detail="Post's ownership doesn't match the current user")
+    PostsService().delete_post(post_id)
