@@ -50,6 +50,7 @@ class Backup:
         FileManager.transfer_files(self.source_dir, self.backup_dir)
 
     def restore(self) -> None:
+        FileManager.clear_directory(self.source_dir)
         FileManager.transfer_files(self.backup_dir, self.source_dir)
         FileManager.clear_directory(self.backup_dir)
 
