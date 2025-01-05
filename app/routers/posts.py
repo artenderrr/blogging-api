@@ -16,10 +16,10 @@ router = APIRouter(tags=["Posts"])
     responses={401: AuthExampleResponses.invalid_token}
 )
 def create_post(
+    username: Annotated[str, Depends(get_current_user)],
     post: Annotated[BasePost, Body(
         openapi_examples=PostsExampleRequests.new_post
-    )],
-    username: Annotated[str, Depends(get_current_user)]
+    )]
 ) -> PostWithMetaData:
     created_post = PostsService().create_post(
         title=post.title,
@@ -52,8 +52,8 @@ def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWit
     }
 )
 def delete_post(
-    post_id: Annotated[int, Depends(existing_post_id)],
-    username: Annotated[str, Depends(get_current_user)]
+    username: Annotated[str, Depends(get_current_user)],
+    post_id: Annotated[int, Depends(existing_post_id)]
 ) -> None:
     if not post_ownership_matches_current_user(post_id, username):
         raise HTTPException(status_code=403, detail="Post's ownership doesn't match the current user")
