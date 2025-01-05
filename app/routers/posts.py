@@ -41,11 +41,21 @@ def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWit
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
 
-@router.put("/posts/{post_id}")
+@router.put(
+    "/posts/{post_id}",
+    summary="Edit a specific post by its unique identifier",
+    responses={
+        401: AuthExampleResponses.invalid_token,
+        403: PostsExampleResponses.restricted_access,
+        404: PostsExampleResponses.nonexistent_post
+    }
+)
 def edit_post(
     username: Annotated[str, Depends(get_current_user)],
     post_id: Annotated[int, Depends(existing_post_id)],
-    update_fields: PostUpdateFields
+    update_fields: Annotated[PostUpdateFields, Body(
+        openapi_examples=PostsExampleRequests.update_fields
+    )]
 ) -> PostWithMetaData:
     if not post_ownership_matches_current_user(post_id, username):
         raise HTTPException(status_code=403, detail="Post's ownership doesn't match the current user")

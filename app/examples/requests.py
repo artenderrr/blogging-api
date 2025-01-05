@@ -109,3 +109,24 @@ class PostsExampleRequests:
             "value": "nonexistent_id"
         }
     }
+
+    update_fields = {
+        "normal": {
+            "summary": "Valid update fields",
+            "description": (
+                "The request body must include at least one valid field defined in "
+                "the `PostUpdateFields` schema."
+            ),
+            "value": {
+                "content": "Edited post content"
+            }
+        },
+        "invalid": {
+            "summary": "Invalid update fields",
+            "description": (
+                "Update fields are considered invalid if the request body is empty or "
+                "contains only fields that do not match the valid fields defined in `PostUpdateFields` schema."
+            ),
+            "value": {}
+        }
+    }
