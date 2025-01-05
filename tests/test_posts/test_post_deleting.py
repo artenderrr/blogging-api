@@ -1,18 +1,11 @@
-import pytest
 from typing import cast
 from tinydb import TinyDB, where
 from fastapi.testclient import TestClient
 from app.main import app
 from tests.utils import AuthorizationData
-from tests.test_posts.utils import test_posts
+from tests.test_posts.utils import create_test_post # noqa
 
 client = TestClient(app)
-
-@pytest.fixture(autouse=True)
-def create_test_post(
-    authorization: AuthorizationData
-) -> None:
-    client.post("/posts", headers=authorization.header, json=test_posts[1])
 
 def get_total_posts(authorization: AuthorizationData) -> int:
     response = client.get("/users/me", headers=authorization.header)
