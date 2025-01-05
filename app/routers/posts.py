@@ -41,7 +41,16 @@ def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWit
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
 
-@router.delete("/posts/{post_id}", status_code=204)
+@router.delete(
+    "/posts/{post_id}",
+    status_code=204,
+    summary="Delete a specific post by its unique identifier",
+    responses={
+        401: AuthExampleResponses.invalid_token,
+        403: PostsExampleResponses.restricted_access,
+        404: PostsExampleResponses.nonexistent_post
+    }
+)
 def delete_post(
     post_id: Annotated[int, Depends(existing_post_id)],
     username: Annotated[str, Depends(get_current_user)]

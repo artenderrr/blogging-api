@@ -45,3 +45,12 @@ class PostsExampleResponses:
             }
         }
     }
+
+    restricted_access = {
+        "description": "Restricted Access",
+        "content": {
+            "application/json": {
+                "example": {"detail": "Post's ownership doesn't match the current user"}
+            }
+        }
+    }
