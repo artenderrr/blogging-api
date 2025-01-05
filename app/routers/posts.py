@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from app.services.posts import PostsService
 from app.dependencies.posts import existing_post_id, post_ownership_matches_current_user
 from app.dependencies.auth import get_current_user, verify_token
-from app.schemas.posts import BasePost, PostWithMetaData
+from app.schemas.posts import BasePost, PostWithMetaData, PostUpdateFields
 from app.examples.requests import PostsExampleRequests
 from app.examples.responses import AuthExampleResponses, PostsExampleResponses
 
@@ -40,6 +40,17 @@ def create_post(
 def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWithMetaData:
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
+
+@router.put("/posts/{post_id}")
+def edit_post(
+    username: Annotated[str, Depends(get_current_user)],
+    post_id: Annotated[int, Depends(existing_post_id)],
+    update_fields: PostUpdateFields
+) -> PostWithMetaData:
+    if not post_ownership_matches_current_user(post_id, username):
+        raise HTTPException(status_code=403, detail="Post's ownership doesn't match the current user")
+    edited_post = PostsService().edit_post(post_id, update_fields)
+    return edited_post
 
 @router.delete(
     "/posts/{post_id}",

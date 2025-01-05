@@ -2,7 +2,7 @@ from typing import cast
 from datetime import datetime
 from tinydb import TinyDB, where
 from tinydb.operations import increment, decrement
-from app.schemas.posts import PostWithMetaData
+from app.schemas.posts import PostWithMetaData, PostUpdateFields
 
 class PostsService:
     def __init__(self) -> None:
@@ -33,6 +33,13 @@ class PostsService:
         retrieved_post["post_id"] = retrieved_post["postId"]
         retrieved_post.pop("postId")
         return PostWithMetaData(**retrieved_post)
+    
+    def edit_post(self, post_id: int, update_fields: PostUpdateFields) -> PostWithMetaData:
+        self.posts_db.update(
+            update_fields.model_dump(exclude_unset=True),
+            where("postId") == post_id
+        )
+        return self.retrieve_post(post_id)
     
     def delete_post(self, post_id: int) -> None:
         author = self._get_post_author(post_id)
