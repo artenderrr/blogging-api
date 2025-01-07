@@ -1,8 +1,9 @@
 from typing import Annotated
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Query, Body, Depends, HTTPException
 from app.services.posts import PostsService
-from app.dependencies.posts import existing_post_id, post_ownership_matches_current_user
 from app.dependencies.auth import get_current_user, verify_token
+from app.dependencies.posts import existing_post_id, post_ownership_matches_current_user
+from app.dependencies.posts import valid_until_parameter, existing_author
 from app.schemas.posts import BasePost, PostWithMetaData, PostUpdateFields
 from app.examples.requests import PostsExampleRequests
 from app.examples.responses import AuthExampleResponses, PostsExampleResponses
@@ -40,6 +41,15 @@ def create_post(
 def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWithMetaData:
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
+
+@router.get("/posts", dependencies=[Depends(verify_token)])
+def retrieve_posts(
+    author: Annotated[str, Depends(existing_author)],
+    until: Annotated[str, Depends(valid_until_parameter)],
+    amount: Annotated[int, Query(gt=0, le=100)] = 5
+) -> list[PostWithMetaData]:
+    retrieved_posts = PostsService().retrieve_posts(author, until, amount)
+    return retrieved_posts
 
 @router.put(
     "/posts/{post_id}",

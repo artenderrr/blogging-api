@@ -53,7 +53,12 @@ class TestRetrievingMultiplePosts:
         response = client.get("/posts", headers=authorization.header)
         retrieved_posts = response.json()
         assert type(retrieved_posts) is list
-        assert retrieved_posts == [*reversed(test_posts)]
+        for i in range(5):
+            assert (
+                (retrieved_posts[i]["title"], retrieved_posts[i]["content"])
+                ==
+                (test_posts[-(i + 1)]["title"], test_posts[-(i + 1)]["content"])
+            )
 
     def test_for_correct_author(
         self,
@@ -61,16 +66,15 @@ class TestRetrievingMultiplePosts:
     ) -> None:
         test_users = ["violet_roses", "nutcracker", "kinshu"]
         for n, test_user in enumerate(test_users):
+            test_user_credentials = {
+                "username": test_user,
+                "password": f"{test_user.title()}Password"
+            }
             self.create_test_posts(
                 test_posts[n * 3 : (n + 1) * 3],
-                AuthorizationData(
-                    credentials={
-                        "username": test_user,
-                        "password": f"{test_user.title()}Password"
-                    }
-                )
+                AuthorizationData(credentials=test_user_credentials)
             )
-        request_user = test_user[1]
+        request_user = test_users[1]
         response = client.get(
             f"/posts?author={request_user}",
             headers=authorization.header
@@ -167,12 +171,16 @@ class TestRetrievingMultiplePosts:
             if post_number == post_to_save_timestamp_after:
                 until = datetime.now()
         response = client.get(
-            f"/posts?until={until.isoformat()}",
+            (
+                "/posts?"
+                f"until={until.isoformat()}&"
+                f"amount={amount_to_create}"
+            ),
             headers=authorization.header
         )
         retrieved_posts = response.json()
         assert type(retrieved_posts) is list
-        expected_posts_amount = amount_to_create - post_to_save_timestamp_after
+        expected_posts_amount = post_to_save_timestamp_after + 1
         assert len(retrieved_posts) == expected_posts_amount
         for post in retrieved_posts:
             post_timestamp = datetime.fromisoformat(post["timestamp"])

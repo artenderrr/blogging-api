@@ -30,9 +30,47 @@ class PostsService:
     
     def retrieve_post(self, post_id: int) -> PostWithMetaData:
         retrieved_post = self.posts_db.get(where("postId") == post_id)
-        retrieved_post["post_id"] = retrieved_post["postId"]
-        retrieved_post.pop("postId")
+        retrieved_post = self._swap_post_id_keys([retrieved_post])[0]
         return PostWithMetaData(**retrieved_post)
+    
+    def retrieve_posts(
+        self,
+        author: str | None,
+        until: str,
+        amount: int
+    ) -> list[PostWithMetaData]:
+        retrieved_posts = self._retrieve_posts_until_timestamp(until)
+        posts_with_post_id_keys_swapped = self._swap_post_id_keys(retrieved_posts)
+        if author:
+            retrieved_posts = filter(
+                lambda post: post["author"] == author,
+                posts_with_post_id_keys_swapped
+            )
+        retrieved_posts = self._sort_posts_by_timestamp(retrieved_posts)
+        return retrieved_posts[:amount]
+    
+    def _retrieve_posts_until_timestamp(self, until: str) -> list[PostWithMetaData]:
+        retrieved_posts = self.posts_db.search(
+            where("timestamp").test(lambda timestamp: (
+                datetime.fromisoformat(timestamp)
+                <
+                datetime.fromisoformat(until)
+            ))
+        )
+        return retrieved_posts
+    
+    def _sort_posts_by_timestamp(self, posts: list[PostWithMetaData]) -> list[PostWithMetaData]:
+        sorted_posts = sorted(posts, key=lambda post: (
+            datetime.fromisoformat(post["timestamp"])
+        ), reverse=True)
+        return sorted_posts
+    
+    def _swap_post_id_keys(self, posts: list[PostWithMetaData]) -> list[PostWithMetaData]:
+        copied_posts = posts.copy()
+        for post in copied_posts:
+            post["post_id"] = post["postId"]
+            post.pop("postId")
+        return copied_posts
     
     def edit_post(self, post_id: int, update_fields: PostUpdateFields) -> PostWithMetaData:
         self.posts_db.update(
