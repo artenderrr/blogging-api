@@ -42,11 +42,25 @@ def retrieve_post(post_id: Annotated[int, Depends(existing_post_id)]) -> PostWit
     retrieved_post = PostsService().retrieve_post(post_id)
     return retrieved_post
 
-@router.get("/posts", dependencies=[Depends(verify_token)])
+@router.get(
+    "/posts",
+    summary="Retrieve the most recent posts",
+    responses={
+        401: AuthExampleResponses.invalid_token,
+        404: PostsExampleResponses.nonexistent_author,
+        400: PostsExampleResponses.invalid_timestamp
+    },
+    dependencies=[Depends(verify_token)]
+)
 def retrieve_posts(
     author: Annotated[str, Depends(existing_author)],
     until: Annotated[str, Depends(valid_until_parameter)],
-    amount: Annotated[int, Query(gt=0, le=100)] = 5
+    amount: Annotated[int, Query(
+        gt=0,
+        le=100,
+        description="The number of posts to retrieve.",
+        openapi_examples=PostsExampleRequests.amount
+    )] = 5
 ) -> list[PostWithMetaData]:
     retrieved_posts = PostsService().retrieve_posts(author, until, amount)
     return retrieved_posts

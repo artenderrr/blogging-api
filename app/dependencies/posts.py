@@ -31,6 +31,11 @@ def is_valid_timestamp(timestamp: str) -> bool:
 
 def valid_until_parameter(
     until: Annotated[str, Query(
+        description=(
+            "A timestamp in ISO 8601 format indicating the cut-off point, "
+            "retrieving posts created before the specified moment in time."
+        ),
+        openapi_examples=PostsExampleRequests.until,
         default_factory=lambda: datetime.now().isoformat()
     )]
 ) -> str:
@@ -40,7 +45,10 @@ def valid_until_parameter(
 
 def existing_author(
     db: Annotated[TinyDB, Depends(db_connection("app/db/users.json"))],
-    author: str | None = None
+    author: Annotated[str | None, Query(
+        description="The username of the user whose posts should be retrieved.",
+        openapi_examples=PostsExampleRequests.author
+    )] = None
 ) -> str | None:
     if author and not db.contains(where("username") == author):
         raise HTTPException(status_code=404, detail="Author with provided username doesn't exist")

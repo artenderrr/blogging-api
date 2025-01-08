@@ -130,3 +130,36 @@ class PostsExampleRequests:
             "value": {}
         }
     }
+
+    author = {
+        "normal": {
+            "summary": "Valid author",
+            "value": "existing_username"
+        },
+        "invalid": {
+            "summary": "Invalid author",
+            "value": "nonexistent_username"
+        }
+    }
+
+    until = {
+        "normal": {
+            "summary": "Valid timestamp",
+            "value": "2025-01-08T11:50:54.404907"
+        },
+        "invalid": {
+            "summary": "Invalid timestamp",
+            "value": "today"
+        }
+    }
+
+    amount = {
+        "normal": {
+            "summary": "Valid amount",
+            "value": 10
+        },
+        "invalid": {
+            "summary": "Invalid amount",
+            "value": -1
+        }
+    }
