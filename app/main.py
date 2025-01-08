@@ -1,23 +1,11 @@
-from typing import Annotated
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from app.routers import auth, users, posts
-from app.dependencies.auth import get_current_user
 
 app = FastAPI(
     title="Blogging API",
-    description="**Description:** API to interact with simple blogging platform.\n\n**Current state:** Experimental.",
-    version="0.0.1"
+    description="**Description:** API to interact with simple blogging platform.\n\n**Current state:** Stable.",
+    version="1.0"
 )
-
-@app.get("/")
-def root() -> dict[str, str]:
-    return {"message": "Hello World!"}
-
-@app.get("/protected")
-def protected(
-    username: Annotated[str, Depends(get_current_user)]
-) -> dict[str, str]:
-    return {"message": f"Hello, {username}!"}
 
 app.include_router(auth.router)
 app.include_router(users.router)
