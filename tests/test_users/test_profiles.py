@@ -10,10 +10,10 @@ client = TestClient(app)
 def get_user_profile(
     authorization: AuthorizationData,
     username: str | None = None
-) -> dict[str, str]:
+) -> dict[str, str | int]:
     endpoint = f"users/{username}" if username else "users/me"
     response = client.get(endpoint, headers=authorization.header)
-    return cast(dict[str, str], response.json())
+    return cast(dict[str, str | int], response.json())
 
 @pytest.mark.parametrize("authorization", test_credentials, indirect=True)
 def test_retrieving_current_user_profile(authorization: AuthorizationData) -> None:
@@ -23,6 +23,23 @@ def test_retrieving_current_user_profile(authorization: AuthorizationData) -> No
         "bio": None,
         "totalPosts": 0
     }
+
+@pytest.mark.parametrize(
+    "posts",
+    [
+        [{"title": "1", "content": "1"}],
+        [{"title": "1", "content": "1"}] * 5,
+        [{"title": "1", "content": "1"}] * 20
+    ]
+)
+def test_total_posts_after_post_creation(
+    authorization: AuthorizationData,
+    posts: list[dict[str, str]]
+) -> None:
+    for post in posts:
+        client.post("/posts", headers=authorization.header, json=post)
+    user_profile = get_user_profile(authorization)
+    assert user_profile["totalPosts"] == len(posts)
 
 @pytest.mark.parametrize(
     "update_fields",

@@ -81,3 +81,85 @@ class UserProfilesExampleRequests:
             "value": {}
         }
     }
+
+class PostsExampleRequests:
+    new_post = {
+        "normal": {
+            "summary": "Valid post",
+            "description": "A valid request must include both required fields: `title` and `content`.",
+            "value": {
+                "title": "My first post",
+                "content": "Here are some contents of my first post!"
+            }
+        },
+        "invalid": {
+            "summary": "Invalid post",
+            "description": "Post is considered invalid if the request body is missing one or both required fields: `title` and `content`.",
+            "value": {}
+        }
+    }
+
+    post_id = {
+        "normal": {
+            "summary": "Valid post ID",
+            "value": 1
+        },
+        "invalid": {
+            "summary": "Invalid post ID",
+            "value": "nonexistent_id"
+        }
+    }
+
+    update_fields = {
+        "normal": {
+            "summary": "Valid update fields",
+            "description": (
+                "The request body must include at least one valid field defined in "
+                "the `PostUpdateFields` schema."
+            ),
+            "value": {
+                "content": "Edited post content"
+            }
+        },
+        "invalid": {
+            "summary": "Invalid update fields",
+            "description": (
+                "Update fields are considered invalid if the request body is empty or "
+                "contains only fields that do not match the valid fields defined in `PostUpdateFields` schema."
+            ),
+            "value": {}
+        }
+    }
+
+    author = {
+        "normal": {
+            "summary": "Valid author",
+            "value": "existing_username"
+        },
+        "invalid": {
+            "summary": "Invalid author",
+            "value": "nonexistent_username"
+        }
+    }
+
+    until = {
+        "normal": {
+            "summary": "Valid timestamp",
+            "value": "2025-01-08T11:50:54.404907"
+        },
+        "invalid": {
+            "summary": "Invalid timestamp",
+            "value": "today"
+        }
+    }
+
+    amount = {
+        "normal": {
+            "summary": "Valid amount",
+            "value": 10
+        },
+        "invalid": {
+            "summary": "Invalid amount",
+            "value": -1
+        }
+    }
